@@ -512,6 +512,7 @@ dependencies = [
  "embedder_traits",
  "euclid",
  "fnv",
+ "font-kit",
  "gleam 0.6.18",
  "half",
  "ipc-channel",

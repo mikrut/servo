@@ -1,0 +1,24 @@
+<html>
+<head>
+	<title>Hello, servo</title>
+</head>
+<body>
+	<h1>Hello, servo!</h1>
+	<p>This is a paragraph. Lorem ipsum =D</p>
+	<canvas id="dest" height="100" width="100"></canvas>
+	
+<script>
+var destCanvasWidth = destCanvasHeight = 100;
+var destCanvas = document.getElementById('dest');
+var destCtx = destCanvas.getContext('2d');
+destCtx.imageSmoothingEnabled = false;
+destCtx.fillStyle = 'red';
+destCtx.fillRect(0, 0,  destCanvasWidth, destCanvasHeight);
+
+destCtx.fillStyle="#0F0";
+destCtx.fillText('11Hello, world', 10, 75, 30);
+destCtx.fillText('11Hello, world', 40, 75, 80);
+
+</script>
+</body>
+</html>

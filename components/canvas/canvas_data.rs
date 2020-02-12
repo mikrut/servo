@@ -263,6 +263,13 @@ pub trait GenericDrawTarget {
         operator: CompositionOp,
     );
     fn fill(&mut self, path: &Path, pattern: Pattern, draw_options: &DrawOptions);
+    fn measure_text(&self, text: &String) -> f64 {
+        error!("Method measure_text not implemented");
+        0.
+    }
+    fn fill_text(&mut self, text: String, x: f64, y: f64, pattern: Pattern, draw_options: Option<&DrawOptions>) {
+        error!("Method fill_text not implemented");
+    }
     fn fill_rect(&mut self, rect: &Rect<f32>, pattern: Pattern, draw_options: Option<&DrawOptions>);
     fn get_format(&self) -> SurfaceFormat;
     fn get_size(&self) -> Size2D<i32>;
@@ -498,11 +505,33 @@ impl<'a> CanvasData<'a> {
         }
     }
 
-    pub fn fill_text(&self, text: String, x: f64, y: f64, max_width: Option<f64>) {
-        error!(
-            "Unimplemented canvas2d.fillText. Values received: {}, {}, {}, {:?}.",
-            text, x, y, max_width
+    pub fn fill_text(&mut self, text: String, x: f64, y: f64, max_width: Option<f64>) {
+        let text_width = self.drawtarget.measure_text(&text);
+        let scale_factor = match max_width {
+            Some(max_width) => if max_width > text_width {
+                text_width
+            } else {
+                max_width / text_width
+            },
+            None => 1.
+        };
+
+        let original_transform = self.drawtarget.get_transform();
+        let new_transform = original_transform
+            .pre_translate(euclid::Vector2D::new(x as f32, 0.))
+            .pre_scale(scale_factor as f32, 1.)
+            .pre_translate(euclid::Vector2D::new(-x as f32, 0.));
+        self.drawtarget.set_transform(&new_transform);
+
+        self.drawtarget.fill_text(
+            text,
+            x,
+            y,
+            self.state.fill_style.clone(),
+            Some(&self.state.draw_options),
         );
+
+        self.drawtarget.set_transform(&original_transform);
     }
 
     pub fn fill_rect(&mut self, rect: &Rect<f32>) {

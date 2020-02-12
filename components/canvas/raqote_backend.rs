@@ -16,6 +16,14 @@ use raqote::PathOp;
 use std::f32::consts::PI;
 use std::marker::PhantomData;
 
+
+use font_kit::family_name::FamilyName;
+use font_kit::properties::Properties;
+use font_kit::source::SystemSource;
+use raqote::Point;
+use raqote::Source;
+use raqote::SolidSource;
+
 pub struct RaqoteBackend;
 
 impl Backend for RaqoteBackend {
@@ -530,6 +538,47 @@ impl GenericDrawTarget for raqote::DrawTarget {
                 draw_options.as_raqote().blend_mode
             ),
         }
+    }
+    fn measure_text(
+        &self,
+        text: &String,
+    ) -> f64 {
+        let font = SystemSource::new()
+            .select_best_match(&[FamilyName::SansSerif], &Properties::new())
+            .unwrap()
+            .load()
+            .unwrap();
+        let point_size = 24.;
+        let mut length = 0.;
+        for c in text.chars() {
+            let id = font.glyph_for_char(c).unwrap();
+            length += (font.advance(id).unwrap() * point_size / 24. / 96.).x;
+        }
+        length as f64
+    }
+    fn fill_text(
+        &mut self,
+        text: String, x: f64, y: f64,
+        pattern: canvas_data::Pattern,
+        draw_options: Option<&DrawOptions>,
+    ) {
+        let font = SystemSource::new()
+            .select_best_match(&[FamilyName::SansSerif], &Properties::new())
+            .unwrap()
+            .load()
+            .unwrap();
+
+        self.draw_text(
+            &font,
+            24.,
+            &text,
+            Point::new(x as f32, y as f32),
+            &pattern.source(),
+            &match draw_options {
+                 Some(draw_options) => *draw_options.as_raqote(),
+                 _ => raqote::DrawOptions::new(),
+            },
+        );
     }
     fn fill_rect(
         &mut self,
