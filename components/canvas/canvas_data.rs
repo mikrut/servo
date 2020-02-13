@@ -263,13 +263,8 @@ pub trait GenericDrawTarget {
         operator: CompositionOp,
     );
     fn fill(&mut self, path: &Path, pattern: Pattern, draw_options: &DrawOptions);
-    fn measure_text(&self, text: &String) -> f64 {
-        error!("Method measure_text not implemented");
-        0.
-    }
-    fn fill_text(&mut self, text: String, x: f64, y: f64, pattern: Pattern, draw_options: Option<&DrawOptions>) {
-        error!("Method fill_text not implemented");
-    }
+    fn measure_text(&self, text: &String);
+    fn fill_text(&mut self, text: String, x: f64, y: f64, pattern: Pattern, draw_options: Option<&DrawOptions>);
     fn fill_rect(&mut self, rect: &Rect<f32>, pattern: Pattern, draw_options: Option<&DrawOptions>);
     fn get_format(&self) -> SurfaceFormat;
     fn get_size(&self) -> Size2D<i32>;
