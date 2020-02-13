@@ -263,7 +263,7 @@ pub trait GenericDrawTarget {
         operator: CompositionOp,
     );
     fn fill(&mut self, path: &Path, pattern: Pattern, draw_options: &DrawOptions);
-    fn measure_text(&self, text: &String);
+    fn measure_text(&self, text: &String) -> f64;
     fn fill_text(&mut self, text: String, x: f64, y: f64, pattern: Pattern, draw_options: Option<&DrawOptions>);
     fn fill_rect(&mut self, rect: &Rect<f32>, pattern: Pattern, draw_options: Option<&DrawOptions>);
     fn get_format(&self) -> SurfaceFormat;
@@ -501,6 +501,17 @@ impl<'a> CanvasData<'a> {
     }
 
     pub fn fill_text(&mut self, text: String, x: f64, y: f64, max_width: Option<f64>) {
+        if !x.is_finite() || !y.is_finite() {
+            return;
+        }
+
+        match max_width {
+            Some(max_width) => if max_width <= 0. || !max_width.is_finite() {
+                return;
+            },
+            _ => {}
+        }
+
         let text_width = self.drawtarget.measure_text(&text);
         let scale_factor = match max_width {
             Some(max_width) => if max_width > text_width {
